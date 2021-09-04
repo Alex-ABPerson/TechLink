@@ -1,0 +1,9 @@
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\bin\Debug\netcoreapp3.1\TechLink.Physics.deps.json
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\bin\Debug\netcoreapp3.1\TechLink.Physics.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\bin\Debug\netcoreapp3.1\TechLink.Physics.pdb
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.csprojAssemblyReference.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.AssemblyInfoInputs.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.AssemblyInfo.cs
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.csproj.CoreCompileInputs.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Physics\obj\Debug\netcoreapp3.1\TechLink.Physics.pdb

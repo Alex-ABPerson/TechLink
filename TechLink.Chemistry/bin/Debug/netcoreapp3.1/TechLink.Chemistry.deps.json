@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "TechLink.Chemistry/1.0.0": {
+        "dependencies": {
+          "TechLink.Core": "1.0.0"
+        },
+        "runtime": {
+          "TechLink.Chemistry.dll": {}
+        }
+      },
+      "TechLink.Core/1.0.0": {
+        "runtime": {
+          "TechLink.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TechLink.Chemistry/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TechLink.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

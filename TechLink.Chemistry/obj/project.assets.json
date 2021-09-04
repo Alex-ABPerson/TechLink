@@ -1,0 +1,95 @@
+{
+  "version": 3,
+  "targets": {
+    "net5.0": {
+      "TechLink.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/TechLink.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TechLink.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TechLink.Core/1.0.0": {
+      "type": "project",
+      "path": "../TechLink.Core/TechLink.Core.csproj",
+      "msbuildProject": "../TechLink.Core/TechLink.Core.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net5.0": [
+      "TechLink.Core >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\alexb\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "G:\\Prog-Projects\\2020\\Personal\\Windows\\TechLink\\TechLink\\TechLink.Chemistry\\TechLink.Chemistry.csproj",
+      "projectName": "TechLink.Chemistry",
+      "projectPath": "G:\\Prog-Projects\\2020\\Personal\\Windows\\TechLink\\TechLink\\TechLink.Chemistry\\TechLink.Chemistry.csproj",
+      "packagesPath": "C:\\Users\\alexb\\.nuget\\packages\\",
+      "outputPath": "G:\\Prog-Projects\\2020\\Personal\\Windows\\TechLink\\TechLink\\TechLink.Chemistry\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Microsoft\\Xamarin\\NuGet\\"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\alexb\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net5.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "projectReferences": {
+            "G:\\Prog-Projects\\2020\\Personal\\Windows\\TechLink\\TechLink\\TechLink.Core\\TechLink.Core.csproj": {
+              "projectPath": "G:\\Prog-Projects\\2020\\Personal\\Windows\\TechLink\\TechLink\\TechLink.Core\\TechLink.Core.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net5.0": {
+        "targetAlias": "net5.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
