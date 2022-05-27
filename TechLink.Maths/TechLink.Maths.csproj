@@ -1,11 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TechLink.Core\TechLink.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Equations\Rewriters\" />
   </ItemGroup>
 
 </Project>

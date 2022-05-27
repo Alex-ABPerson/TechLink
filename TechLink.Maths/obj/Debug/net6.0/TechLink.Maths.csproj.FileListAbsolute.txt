@@ -1,0 +1,15 @@
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\TechLink.Maths.deps.json
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\TechLink.Maths.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\ref\TechLink.Maths.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\TechLink.Maths.pdb
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\TechLink.Core.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\bin\Debug\net6.0\TechLink.Core.pdb
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.csproj.AssemblyReference.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.GeneratedMSBuildEditorConfig.editorconfig
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.AssemblyInfoInputs.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.AssemblyInfo.cs
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.csproj.CoreCompileInputs.cache
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.csproj.CopyComplete
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\ref\TechLink.Maths.dll
+G:\Prog-Projects\2020\Personal\Windows\TechLink\TechLink\TechLink.Maths\obj\Debug\net6.0\TechLink.Maths.pdb

@@ -51,8 +51,8 @@ namespace TechLink.Maths.Equations.Parsing
                     var itm = ParseDivision();
 
                     // Negate it if our addition was a subtract.
-                    if ((EquationTokenType)GetTokenType(additiveSign) == EquationTokenType.Subtract) 
-                        itm.IsNegative = !itm.IsNegative;
+                    if ((EquationTokenType)GetTokenType(additiveSign) == EquationTokenType.Subtract)
+                        itm = new TermLine(new Number(-1), itm);
 
                     newLine.Items.Add(itm);
                 }
@@ -118,8 +118,10 @@ namespace TechLink.Maths.Equations.Parsing
                 isNegate = !isNegate;
 
             TreeItem root = ParseRoot();
-            root.IsNegative = isNegate;
-            return root;
+            if (isNegate)
+                return new TermLine(new Number(-1), root);
+            else
+                return root;
         }
 
         TreeItem ParseRoot()

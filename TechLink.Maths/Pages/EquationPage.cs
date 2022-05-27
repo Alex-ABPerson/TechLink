@@ -12,7 +12,7 @@ namespace TechLink.Maths.Pages
 {
     public class EquationPage : PageSet
     {
-        public Equation Equation;
+        public Equation? Equation;
 
         void ParseNew()
         {

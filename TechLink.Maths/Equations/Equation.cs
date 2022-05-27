@@ -17,5 +17,7 @@ namespace TechLink.Maths.Equations
             var rightEquation = KnownCast<Equation>(right);
             return Left.Equals(rightEquation.Left) && Right.Equals(rightEquation.Right);
         }
+
+        public override TreeItem Clone() => new Equation(Left.Clone(), Right.Clone());
     }
 }

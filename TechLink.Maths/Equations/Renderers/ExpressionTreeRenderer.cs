@@ -19,13 +19,13 @@ namespace TechLink.Maths.Equations.Renderers
                 {
                     // Simple values
                     case Number number:
-                        WriteTitle(number.Value.ToString(), item.IsNegative);
+                        WriteTitle(number.Value.ToString());
                         break;
                     case Variable variable:
-                        WriteTitle(variable.Name.ToString(), item.IsNegative);
+                        WriteTitle(variable.Name.ToString());
                         break;
                     case AdditiveLine line:
-                        OpenBlock("Add", item.IsNegative);
+                        OpenBlock("Add");
 
                         for (int i = 0; i < line.Items.Count; i++)
                             RenderItem(line.Items[i]);
@@ -33,7 +33,7 @@ namespace TechLink.Maths.Equations.Renderers
                         CloseBlock();
                         break;
                     case TermLine term:
-                        OpenBlock("Multiply", item.IsNegative);
+                        OpenBlock("Multiply");
 
                         for (int i = 0; i < term.Terms.Count; i++)
                             RenderItem(term.Terms[i]);
@@ -41,7 +41,7 @@ namespace TechLink.Maths.Equations.Renderers
                         CloseBlock();
                         break;
                     case Division term:
-                        OpenBlock("Divide", item.IsNegative);
+                        OpenBlock("Divide");
 
                         RenderItem(term.Top);
                         RenderItem(term.Bottom);
@@ -49,7 +49,7 @@ namespace TechLink.Maths.Equations.Renderers
                         CloseBlock();
                         break;
                     case Root root:
-                        OpenBlock("Root", item.IsNegative);
+                        OpenBlock("Root");
 
                         RenderItem(root.Inner);
                         RenderItem(root.Index);
@@ -57,7 +57,7 @@ namespace TechLink.Maths.Equations.Renderers
                         CloseBlock();
                         break;
                     case Power power:
-                        OpenBlock("Power", item.IsNegative);
+                        OpenBlock("Power");
 
                         RenderItem(power.Base);
                         RenderItem(power.Exponent);
@@ -73,7 +73,7 @@ namespace TechLink.Maths.Equations.Renderers
                             _ => throw new Exception("Invalid function given!")
                         };
 
-                        OpenBlock($"Func{(function.IsInverse ? "-1" : "")} ({funcTitle})", item.IsNegative);
+                        OpenBlock($"Func{(function.IsInverse ? "-1" : "")} ({funcTitle})");
 
                         for (int i = 0; i < function.Arguments.Count; i++)
                             RenderItem(function.Arguments[i]);
@@ -83,9 +83,9 @@ namespace TechLink.Maths.Equations.Renderers
                 }
             }
 
-            void OpenBlock(string title, bool isNegative)
+            void OpenBlock(string title)
             {
-                WriteTitle(title, isNegative);
+                WriteTitle(title);
                 IndentationLevel++;
 
                 // Write the opening "|" on the block.
@@ -93,16 +93,13 @@ namespace TechLink.Maths.Equations.Renderers
                 Interface.WriteLine();
             }
 
-            private void WriteTitle(string title, bool isNegative)
+            private void WriteTitle(string title)
             {
                 WriteIndentation();
 
                 // Don't write the arrow if we're on level 0.
                 if (IndentationLevel != 0) Interface.Write("-> ", InterfaceColor.Unimportant);
                 Interface.Write(title);
-
-                if (isNegative)
-                    Interface.Write(" (Negative)", InterfaceColor.Emphasis);
 
                 Interface.WriteLine();
             }

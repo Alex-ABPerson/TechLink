@@ -11,22 +11,19 @@ namespace TechLink.Maths.Equations
 {
     public abstract class TreeItem
     {
-        public bool IsNegative = false;
         bool _hasHashCache = false;
         int _hashCache;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             // If the hash codes don't match, then these definitely don't match.
             //if (GetHashCode() != obj.GetHashCode()) return false;
 
             // If the types don't match, they don't match.
+            if (obj == null) return false;
             if (obj.GetType() != GetType()) return false;
 
             var asTreeItem = KnownCast<TreeItem>(obj);
-
-            // If the negative sign doesn't match, they don't match.
-            if (IsNegative != asTreeItem.IsNegative) return false;
 
             return Matches(asTreeItem);
         }
@@ -55,13 +52,15 @@ namespace TechLink.Maths.Equations
         }
 
         protected void InvalidateHashCode() => _hasHashCache = false;
+
+        public abstract TreeItem Clone();
     }
 
     public sealed class Number : TreeItem
     {
-        public uint Value { get; set; }
+        public long Value { get; set; }
 
-        public Number(uint value) => Value = value;
+        public Number(long value) => Value = value;
 
         protected override bool Matches(TreeItem right)
         {
@@ -70,6 +69,8 @@ namespace TechLink.Maths.Equations
         }
 
         protected override int ComputeHash() => (int)Value;
+
+        public override TreeItem Clone() => new Number(Value);
     }
 
     public sealed class Variable : TreeItem
@@ -85,18 +86,18 @@ namespace TechLink.Maths.Equations
             var rightVariable = KnownCast<Variable>(right);
             return Name == rightVariable.Name;
         }
+
+        public override TreeItem Clone() => new Variable(Name);
     }
 
     public sealed class AdditiveLine : TreeItem
     {
-        public IList<TreeItem> Items = new List<TreeItem>();
+        public IList<TreeItem> Items;
 
-        public AdditiveLine(TreeItem first) => Items.Add(first);
-        public AdditiveLine(TreeItem first, TreeItem second)
-        {
-            Items.Add(first);
-            Items.Add(second);
-        }
+        public AdditiveLine() => Items = new List<TreeItem>();
+        public AdditiveLine(TreeItem first) : this() => Items.Add(first);
+        public AdditiveLine(TreeItem first, TreeItem second) : this(first) => Items.Add(second);
+        public AdditiveLine(List<TreeItem> items) => Items = items;
 
         protected override bool Matches(TreeItem right)
         {
@@ -110,25 +111,30 @@ namespace TechLink.Maths.Equations
 
             return true;
         }
+
+        public override TreeItem Clone()
+        {
+            var newLst = new List<TreeItem>(Items.Count);
+            for (int i = 0; i < Items.Count; i++)
+                newLst.Add(Items[i].Clone());
+
+            return new AdditiveLine(newLst);
+        }
     }
 
     public sealed class TermLine : TreeItem
     {
-        public uint Coefficient { get; set; }
-        public IList<TreeItem> Terms { get; set; } = new List<TreeItem>();
+        public IList<TreeItem> Terms;
 
-        public TermLine(TreeItem first) => Terms.Add(first);
-        public TermLine(TreeItem first, TreeItem second)
-        {
-            Terms.Add(first);
-            Terms.Add(second);
-        }
+        public TermLine() => Terms = new List<TreeItem>();
+        public TermLine(TreeItem first) : this() => Terms.Add(first);
+        public TermLine(TreeItem first, TreeItem second) : this(first) => Terms.Add(second);
+        public TermLine(IList<TreeItem> lst) => Terms = lst;
 
         protected override bool Matches(TreeItem right)
         {
             var rightLine = KnownCast<TermLine>(right);
 
-            if (Coefficient != rightLine.Coefficient) return false;
             if (Terms.Count != rightLine.Terms.Count) return false;
 
             for (int i = 0; i < Terms.Count; i++)
@@ -136,6 +142,15 @@ namespace TechLink.Maths.Equations
                     return false;
 
             return true;
+        }
+
+        public override TreeItem Clone()
+        {
+            var newLst = new List<TreeItem>(Terms.Count);
+            for (int i = 0; i < Terms.Count; i++)
+                newLst.Add(Terms[i].Clone());
+
+            return new TermLine(newLst);
         }
     }
 
@@ -151,6 +166,8 @@ namespace TechLink.Maths.Equations
             var rightDivision = KnownCast<Division>(right);
             return Top.Equals(rightDivision.Top) && Bottom.Equals(rightDivision.Bottom);
         }
+
+        public override TreeItem Clone() => new Division(Top.Clone(), Bottom.Clone());
     }
 
     public sealed class Root : TreeItem
@@ -166,6 +183,8 @@ namespace TechLink.Maths.Equations
             var rightRoot = KnownCast<Root>(right);
             return Inner.Equals(rightRoot.Inner) && Index.Equals(rightRoot.Index);
         }
+
+        public override TreeItem Clone() => new Root(Inner.Clone(), Index.Clone());
     }
 
     public sealed class Power : TreeItem
@@ -180,6 +199,8 @@ namespace TechLink.Maths.Equations
             var rightPower = KnownCast<Power>(right);
             return Base.Equals(rightPower.Base) && Exponent.Equals(rightPower.Exponent);
         }
+
+        public override TreeItem Clone() => new Power(Base.Clone(), Exponent.Clone());
     }
 
     public sealed class Function : TreeItem
@@ -211,5 +232,7 @@ namespace TechLink.Maths.Equations
 
             return true;
         }
+
+        public override TreeItem Clone() => new Function(Type, Arguments[0], IsInverse);
     }
 }

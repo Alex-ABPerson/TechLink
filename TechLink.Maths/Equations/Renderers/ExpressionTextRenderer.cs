@@ -12,13 +12,6 @@ namespace TechLink.Maths.Equations.Renderers
 
         public static void RenderItem(TreeItem item, bool withBrackets)
         {
-            // If we're putting a negate (-) character before it, we must make sure we wrap it in brackets.
-            if (item.IsNegative)
-            {
-                Interface.Write("-");
-                withBrackets = true;
-            }
-
             bool shouldWriteBrackets = withBrackets && IsBlock(item);
             if (shouldWriteBrackets) Interface.Write("(");
 
@@ -76,7 +69,7 @@ namespace TechLink.Maths.Equations.Renderers
                 Function.FunctionType.Sin => "sin",
                 Function.FunctionType.Cos => "cos",
                 Function.FunctionType.Tan => "tan",
-                _ => null,
+                _ => "unknown-f",
             };
 
             Interface.Write(functionTitle);
@@ -112,8 +105,23 @@ namespace TechLink.Maths.Equations.Renderers
 
         public static void RenderTermLine(TermLine line)
         {
+            // If there are no items, don't write anything.
             if (line.Terms.Count == 0) return;
 
+            // If the term line is literally just "-1 x abc", just write "-abc".
+            if (line.Terms.Count == 2)
+            {
+                bool isNegOnLeft = line.Terms[0] is Number { Value: -1 };
+
+                if (isNegOnLeft || line.Terms[1] is Number { Value: -1 })
+                {
+                    Interface.Write("-");
+                    RenderItem(line.Terms[isNegOnLeft ? 1 : 0], true);
+                    return;
+                }
+            }
+
+            // Otherwise, render as normal
             RenderItem(line.Terms[0], true);
 
             for (int i = 1; i < line.Terms.Count; i++)
@@ -131,6 +139,6 @@ namespace TechLink.Maths.Equations.Renderers
             RenderItem(division.Bottom, true);
         }
 
-        static bool IsBlock(TreeItem item) => item is AdditiveLine;
+        static bool IsBlock(TreeItem item) => item is AdditiveLine || item is TermLine;
     }
 }

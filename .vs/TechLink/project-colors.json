@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "a0e4e140-5070-49d8-a3b6-432b38a4df9a": {
+      "ProjectGuid": "a0e4e140-5070-49d8-a3b6-432b38a4df9a",
+      "DisplayName": "TechLink",
+      "ColorIndex": 0
+    },
+    "56623b80-1cb2-4b49-a087-b189fbe43051": {
+      "ProjectGuid": "56623b80-1cb2-4b49-a087-b189fbe43051",
+      "DisplayName": "TechLink.Maths",
+      "ColorIndex": 1
+    },
+    "b24fa313-46d3-47ea-acca-658c5a9a2498": {
+      "ProjectGuid": "b24fa313-46d3-47ea-acca-658c5a9a2498",
+      "DisplayName": "TechLink.Core",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}
