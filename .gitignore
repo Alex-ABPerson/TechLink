@@ -15,6 +15,7 @@
 *.pdb
 *.swp
 *.*.user
+*.FileListAbsolute.txt
 .vs
 bin
 obj
