@@ -112,7 +112,6 @@ namespace TechLink.Maths.Equations.Renderers
             if (line.Terms.Count == 2)
             {
                 bool isNegOnLeft = line.Terms[0] is Number { Value: -1 };
-
                 if (isNegOnLeft || line.Terms[1] is Number { Value: -1 })
                 {
                     Interface.Write("-");
@@ -126,9 +125,11 @@ namespace TechLink.Maths.Equations.Renderers
 
             for (int i = 1; i < line.Terms.Count; i++)
             {
-                // Only put a multiply (*) character when we have two numbers after each other.
-                if (line.Terms[i] is Number && line.Terms[i - 1] is Number) Interface.Write(" * ");
+                // Put brackets when we have two numbers after each other
+                bool twoNumbers = line.Terms[i] is Number && line.Terms[i - 1] is Number;
+                if (twoNumbers) Interface.Write("(");
                 RenderItem(line.Terms[i], true);
+                if (twoNumbers) Interface.Write(")");
             }
         }
 

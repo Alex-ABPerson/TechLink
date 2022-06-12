@@ -92,7 +92,7 @@ namespace TechLink.Maths.Equations
 
     public sealed class AdditiveLine : TreeItem
     {
-        public IList<TreeItem> Items;
+        public List<TreeItem> Items;
 
         public AdditiveLine() => Items = new List<TreeItem>();
         public AdditiveLine(TreeItem first) : this() => Items.Add(first);
@@ -124,12 +124,12 @@ namespace TechLink.Maths.Equations
 
     public sealed class TermLine : TreeItem
     {
-        public IList<TreeItem> Terms;
+        public List<TreeItem> Terms;
 
         public TermLine() => Terms = new List<TreeItem>();
         public TermLine(TreeItem first) : this() => Terms.Add(first);
         public TermLine(TreeItem first, TreeItem second) : this(first) => Terms.Add(second);
-        public TermLine(IList<TreeItem> lst) => Terms = lst;
+        public TermLine(List<TreeItem> lst) => Terms = lst;
 
         protected override bool Matches(TreeItem right)
         {
@@ -212,7 +212,7 @@ namespace TechLink.Maths.Equations
 
         public FunctionType Type;
         public bool IsInverse;
-        public IList<TreeItem> Arguments = new List<TreeItem>();
+        public List<TreeItem> Arguments = new List<TreeItem>();
 
         public Function(FunctionType type, TreeItem inner, bool isInverse)
         {

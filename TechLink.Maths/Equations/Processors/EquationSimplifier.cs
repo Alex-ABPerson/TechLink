@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TechLink.Maths.Equations.Helpers;
 using TechLink.Maths.Equations.Processors.Core;
 
 namespace TechLink.Maths.Equations.Processors
@@ -32,25 +34,45 @@ namespace TechLink.Maths.Equations.Processors
 
         public PathTreeItem Simplify()
         {
-            int noLayers = DetermineDeepestLevel(_rootItm);
-            for (int i = noLayers - 1; i >= 0; i--)
-            {
-
-            }
-
-            if (_rootItm is Number || _rootItm is Variable) return _rootPath;
-            SimplifyItem(_rootItm, _rootItm, null, null!, root => root, null!, null!, true);
+            ProcessPath(_rootItm, _rootPath);
             return _rootPath;
         }
 
-        public void ProcessLayer(int layer)
+        public void ProcessPath(TreeItem currentTree, PathTreeItem path)
         {
-            // First process the layer below this one, then process those items
-
-            void AddItemInLayer(TreeItem itm)
+            var exp = new TreeExplorer(currentTree, true);
+            exp.IterateUp((isRoot, itm) =>
             {
+                var processors = GetProcessors(itm);
+                foreach (var processor in processors)
+                {
+                    TreeItem processed = processor.Perform(itm);
+                    if (!processed.Equals(itm))
+                    {
+                        // If the path doesn't already exist, process it!
+                        if (!AddToPathAndProcessParent(processed, out PathTreeItem? newPath))
+                            ProcessPath(newPath.Item, newPath);
+                    }
+                }
 
-            }
+                // Returns: Already exists in path
+                bool AddToPathAndProcessParent(TreeItem newItm, [NotNullWhen(false)]out PathTreeItem? newPath)
+                {
+                    newPath = null;
+
+                    // Create a new tree with this item swapped
+                    TreeItem newTree = isRoot ? newItm : currentTree.Clone();
+                    if (!isRoot) exp.SetCurrentItemInTree(newTree, newItm);
+
+                    // If it's in the tree, don't process further
+                    if (CheckIsInPathTree(newTree)) return true;
+
+                    newPath = new PathTreeItem(newTree);
+                    path.Children.Add(newPath);
+
+                    return false;
+                }
+            });
         }
 
         public int DetermineDeepestLevel(TreeItem itm)
@@ -78,55 +100,13 @@ namespace TechLink.Maths.Equations.Processors
                 return;
             }
 
-            // Simplify the children
-
-            // Now, simplify this item.
-
-
             // The way this algorithm works is it simplifies all the children FIRST, then via this callback works its way back up and
             // simplifies the parents for every different combination of simplification the children could get.
             CreatePathsForChildren(originalItm, root, originalPath, getCurrentItemIn, (itm, path) =>
             {
-                var processors = GetProcessors(itm);
-                foreach (var processor in processors)
-                {
-                    TreeItem processed = processor.Perform(itm);
-                    if (!processed.Equals(itm))
-                    {
-                        if (AddToPathAndProcessParent(processed, out PathTreeItem? newPath)) continue;
+                
 
-                        // Try simplifying this item again, as it may be possible to simplify it or its children further now.
-                        SimplifyItem(processed, root, newPath, getParentIn, getCurrentItemIn, swapInParent, processParent, true);
-                    }
-                }
-
-                // Returns: Already exists in path
-                bool AddToPathAndProcessParent(TreeItem newItm, out PathTreeItem? newPath)
-                {
-                    newPath = null;
-                    TreeItem? parent = null;
-
-                    // Create a new tree with this item swapped
-                    TreeItem newTree = isRoot ? newItm : root.Clone();
-                    if (!isRoot)
-                    {
-                        parent = getParentIn(newTree);
-                        swapInParent(parent, newItm);
-                    }
-
-                    if (CheckIsInPathTree(newTree)) return true;
-
-                    // Otherwise, add it to the pathway - if we're the very first simplification to occur, start this in the root of the paths.
-                    newPath = new PathTreeItem(newTree);
-                    if (path == null)
-                        _rootPath.Children.Add(newPath);
-                    else
-                        path.Children.Add(newPath);
-
-                    // Now that we've processed this item - make sure we also process our parent!
-                    if (!isRoot) processParent(parent!, newPath);
-                    return false;
-                }
+                
             });
         }
 
@@ -187,13 +167,15 @@ namespace TechLink.Maths.Equations.Processors
             }
         }
 
-        static readonly Processor[] _additiveProcessors = new Processor[] { new PassthroughProcessor(), new NumberFold(), new RedundantLineExpander() };
-        static readonly Processor[] _termLineProcessors = new Processor[] { new PassthroughProcessor(), new NumberFold(), new RedundantLineExpander() };
+        static readonly Processor[] _additiveProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
+        static readonly Processor[] _termLineProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
+        static readonly Processor[] _divisionProcessors = new Processor[] { new NumberFold() };
 
         public IList<Processor> GetProcessors(TreeItem itm) => itm switch
         {
             AdditiveLine => _additiveProcessors,
             TermLine => _termLineProcessors,
+            Division => _divisionProcessors,
             _ => Array.Empty<Processor>()
         };
     }

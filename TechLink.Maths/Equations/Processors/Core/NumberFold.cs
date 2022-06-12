@@ -12,6 +12,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// 2 + 4 to 6 or 
     /// 4 * 8 to 32 or 
     /// 2 + a + 6 = 8 + a
+    /// 4 / 2 to 2
     /// </summary>
     internal class NumberFold : Processor
     {
@@ -19,6 +20,7 @@ namespace TechLink.Maths.Equations.Processors.Core
         {
             AdditiveLine additive => PerformAdditive(additive),
             TermLine line => PerformTermLine(line),
+            Division div => PerformDivision(div),
             _ => throw new Exception()
         };
 
@@ -74,6 +76,16 @@ namespace TechLink.Maths.Equations.Processors.Core
                     newTreeItem.Terms.Add(line.Terms[i]);
 
             return newTreeItem;
+        }
+
+        public TreeItem PerformDivision(Division div)
+        {
+            if (div.Top is not Number topNum || div.Bottom is not Number bottomNum) return div;
+
+            // Only do this if they're divisible.
+            if (topNum.Value % bottomNum.Value != 0) return div;
+
+            return new Number(topNum.Value / bottomNum.Value);
         }
     }
 }

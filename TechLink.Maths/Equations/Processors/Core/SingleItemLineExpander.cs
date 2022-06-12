@@ -9,7 +9,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// <summary>
     /// A processor responsible for transforming one-element lines into just that element
     /// </summary>
-    internal class RedundantLineExpander : Processor
+    internal class SingleItemLineExpander : Processor
     {
         public override TreeItem Perform(TreeItem itm) => itm switch
         {
