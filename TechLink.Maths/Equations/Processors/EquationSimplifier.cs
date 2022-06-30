@@ -40,6 +40,7 @@ namespace TechLink.Maths.Equations.Processors
 
         public void ProcessPath(TreeItem currentTree, PathTreeItem path)
         {
+            // TODO: Debug (2x+3)(4x+5)
             var exp = new TreeExplorer(currentTree, true);
             exp.IterateUp((isRoot, itm) =>
             {
@@ -168,7 +169,7 @@ namespace TechLink.Maths.Equations.Processors
         }
 
         static readonly Processor[] _additiveProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
-        static readonly Processor[] _termLineProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
+        static readonly Processor[] _termLineProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander(), new Expander() };
         static readonly Processor[] _divisionProcessors = new Processor[] { new NumberFold() };
 
         public IList<Processor> GetProcessors(TreeItem itm) => itm switch

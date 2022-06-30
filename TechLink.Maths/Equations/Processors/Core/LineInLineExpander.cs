@@ -40,15 +40,17 @@ namespace TechLink.Maths.Equations.Processors.Core
         {
             AdditiveLine? newLine = null;
 
+            int posInNewLine = 0;
             for (int i = 0; i < line.Items.Count; i++)
                 if (line.Items[i] is AdditiveLine innerLine)
                 {
                     newLine ??= (AdditiveLine)line.Clone();
-                    newLine.Items.RemoveAt(i);
+                    newLine.Items.RemoveAt(posInNewLine);
                     newLine.Items.AddRange(innerLine.Items);
                 }
+                else posInNewLine++;
 
-            return line;
+            return newLine ?? line;
         }
     }
 }

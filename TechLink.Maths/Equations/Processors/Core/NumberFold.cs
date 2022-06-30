@@ -26,15 +26,21 @@ namespace TechLink.Maths.Equations.Processors.Core
 
         public TreeItem PerformAdditive(AdditiveLine additive)
         {
+            bool hadMultipleNumbers = false;
             long? currentNum = null;
             for (int i = 0; i < additive.Items.Count; i++)
             {
                 if (additive.Items[i] is Number num)
                 {
+                    hadMultipleNumbers = currentNum != null;
                     currentNum ??= 0;
                     currentNum += num.Value;
                 }
             }
+
+            // If there weren't multiple numbers in there, don't make any changes.
+            // This is just to save us from doing "2x + 3" into "3 + 2x" which looks really silly.
+            if (!hadMultipleNumbers) return additive;
 
             if (currentNum != null)
             {
@@ -68,6 +74,7 @@ namespace TechLink.Maths.Equations.Processors.Core
             // Numbers make 0
             if (currentNum == 0) return new Number(0);
 
+            // TODO: Optimize for only one number in termline.
             // With numbers
             var newTreeItem = currentNum == 1 ? new TermLine() : new TermLine(new Number(currentNum.Value));
 

@@ -140,6 +140,6 @@ namespace TechLink.Maths.Equations.Renderers
             RenderItem(division.Bottom, true);
         }
 
-        static bool IsBlock(TreeItem item) => item is AdditiveLine || item is TermLine;
+        static bool IsBlock(TreeItem item) => item is AdditiveLine;
     }
 }
