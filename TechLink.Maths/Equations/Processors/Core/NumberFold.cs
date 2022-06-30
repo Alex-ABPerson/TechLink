@@ -60,6 +60,8 @@ namespace TechLink.Maths.Equations.Processors.Core
 
         public TreeItem PerformTermLine(TermLine line)
         {
+            bool hasNonNumbers = false;
+
             long? currentNum = null;
             for (int i = 0; i < line.Terms.Count; i++)
             {
@@ -68,6 +70,7 @@ namespace TechLink.Maths.Equations.Processors.Core
                     currentNum ??= 1;
                     currentNum *= num.Value;
                 }
+                else hasNonNumbers = true;
             }
 
             // No numbers
@@ -76,7 +79,9 @@ namespace TechLink.Maths.Equations.Processors.Core
             // Numbers make 0
             if (currentNum == 0) return new Number(0);
 
-            // TODO: Optimize for only one number in termline.
+            // No non-number components (saves perf and extra path steps)
+            if (!hasNonNumbers) return new Number(currentNum.Value);
+
             // With numbers
             var newTreeItem = currentNum == 1 ? new TermLine() : new TermLine(new Number(currentNum.Value));
 
