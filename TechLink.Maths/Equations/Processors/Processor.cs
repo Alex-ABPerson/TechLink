@@ -8,6 +8,7 @@ namespace TechLink.Maths.Equations.Processors
 {
     public abstract class Processor
     {
+        public virtual bool Required => false;
         public abstract TreeItem Perform(TreeItem itm);
     }
 }

@@ -16,6 +16,8 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// </summary>
     internal class NumberFold : Processor
     {
+        public override bool Required => true;
+
         public override TreeItem Perform(TreeItem itm) => itm switch
         {
             AdditiveLine additive => PerformAdditive(additive),

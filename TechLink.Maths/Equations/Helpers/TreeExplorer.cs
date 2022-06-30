@@ -22,6 +22,10 @@ namespace TechLink.Maths.Equations.Helpers
             {
                 while (MoveNextDown());
                 handler(_currentState.Count == 1, PeekState().Item);
+
+                // If cancelled, stop.
+                if (_currentState.Count == 0) return;
+
                 PopState();
             }
         }
@@ -76,6 +80,7 @@ namespace TechLink.Maths.Equations.Helpers
 
         public void SetCurrentItemInTree(TreeItem tree, TreeItem newValue)
         {
+            if (_currentState.Count == 0) throw new Exception("Cannot set current item finished/cancelled iteration.");
             if (_currentState.Count == 1) throw new Exception("Can't assign child of a single-item tree.");
 
             // Iterate through the given tree towards the item.
@@ -140,6 +145,8 @@ namespace TechLink.Maths.Equations.Helpers
             }
 
         }
+
+        public void CancelIteration() => _currentState.Clear();
 
         void PushState(ItemState newState) => _currentState.Add(newState);
         ItemState PopState()

@@ -40,7 +40,6 @@ namespace TechLink.Maths.Equations.Processors
 
         public void ProcessPath(TreeItem currentTree, PathTreeItem path)
         {
-            // TODO: Debug (2x+3)(4x+5)
             var exp = new TreeExplorer(currentTree, true);
             exp.IterateUp((isRoot, itm) =>
             {
@@ -52,7 +51,18 @@ namespace TechLink.Maths.Equations.Processors
                     {
                         // If the path doesn't already exist, process it!
                         if (!AddToPathAndProcessParent(processed, out PathTreeItem? newPath))
+                        {
                             ProcessPath(newPath.Item, newPath);
+
+                            // If this processor was "required", don't bother processing alternatives, only go forward with the path we just did with this processor.
+                            // This is a performance (and sanity when debugging) feature for really basic operations that just have no reason to explore alternatives.
+                            // E.g. Number fold or simple tree moves like "(x + y) + 3" to "x + y + 3", where there's literally zero point in *not* doing them.
+                            if (processor.Required)
+                            {
+                                exp.CancelIteration();
+                                return;
+                            }
+                        }
                     }
                 }
 
@@ -168,9 +178,20 @@ namespace TechLink.Maths.Equations.Processors
             }
         }
 
-        static readonly Processor[] _additiveProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
-        static readonly Processor[] _termLineProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander(), new Expander() };
-        static readonly Processor[] _divisionProcessors = new Processor[] { new NumberFold() };
+        static readonly Processor[] _additiveProcessors = new Processor[] { 
+            // Required (must come first)
+            new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() 
+        };
+        static readonly Processor[] _termLineProcessors = new Processor[] { 
+            // Required (must come first)
+            new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander(), 
+            
+            // General:
+            new Expander() };
+        static readonly Processor[] _divisionProcessors = new Processor[] { 
+            // Required (must come first)
+            new NumberFold() 
+            };
 
         public IList<Processor> GetProcessors(TreeItem itm) => itm switch
         {

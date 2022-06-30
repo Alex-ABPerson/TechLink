@@ -11,6 +11,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// </summary>
     internal class SingleItemLineExpander : Processor
     {
+        public override bool Required => true;
         public override TreeItem Perform(TreeItem itm) => itm switch
         {
             AdditiveLine line => PerformAdditive(line),

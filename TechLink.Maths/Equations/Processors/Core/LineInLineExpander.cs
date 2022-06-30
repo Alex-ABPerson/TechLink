@@ -11,6 +11,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// </summary>
     public class LineInLineExpander : Processor
     {
+        public override bool Required => true;
         public override TreeItem Perform(TreeItem itm)
         {
             return itm switch
