@@ -105,9 +105,19 @@ namespace TechLink.Maths.Equations
 
             if (Items.Count != rightLine.Items.Count) return false;
 
+            // NOTE: We're counting things with different orders as the same here too.
             for (int i = 0; i < Items.Count; i++)
-                if (!Items[i].Equals(rightLine.Items[i]))
-                    return false;
+            {
+                for (int j = 0; j < rightLine.Items.Count; j++)
+                {
+                    if (Items[i].Equals(rightLine.Items[j]))
+                        goto FoundEqual;
+                }
+
+                return false;
+
+            FoundEqual:;
+            }
 
             return true;
         }
@@ -137,9 +147,19 @@ namespace TechLink.Maths.Equations
 
             if (Terms.Count != rightLine.Terms.Count) return false;
 
+            // NOTE: We're counting things with different orders as the same here too.
             for (int i = 0; i < Terms.Count; i++)
-                if (!Terms[i].Equals(rightLine.Terms[i]))
-                    return false;
+            {
+                for (int j = 0; j < rightLine.Terms.Count; j++)
+                {
+                    if (Terms[i].Equals(rightLine.Terms[j]))
+                        goto FoundEqual;
+                }
+
+                return false;
+
+            FoundEqual:;
+            }
 
             return true;
         }
