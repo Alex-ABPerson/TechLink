@@ -11,6 +11,9 @@ namespace TechLink.Maths.Equations.Processors.Core
     /// </summary>
     internal class Expander : Processor
     {
+        public override string Title => "Expansion";
+
+        // TODO: Consider adding polynomialXpolynomial support for perf (less paths to process)
         public override TreeItem Perform(TreeItem itm)
         {
             TermLine line = (TermLine)itm;

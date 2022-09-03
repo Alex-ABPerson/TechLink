@@ -17,6 +17,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     internal class NumberFold : Processor
     {
         public override bool Required => true;
+        public override string Title => "NumberFold";
 
         public override TreeItem Perform(TreeItem itm) => itm switch
         {
@@ -41,7 +42,7 @@ namespace TechLink.Maths.Equations.Processors.Core
             }
 
             // If there weren't multiple numbers in there, don't make any changes.
-            // This is just to save us from doing "2x + 3" into "3 + 2x" which looks really silly.
+            // This is mainly to save us from pointlessly doing "2x + 3" into "3 + 2x" which looks really silly.
             if (!hadMultipleNumbers) return additive;
 
             if (currentNum != null)
@@ -79,10 +80,10 @@ namespace TechLink.Maths.Equations.Processors.Core
             // Numbers make 0
             if (currentNum == 0) return new Number(0);
 
-            // No non-number components (saves perf and extra path steps)
+            // No non-number components (saves perf and extra path steps if treating specially like this)
             if (!hasNonNumbers) return new Number(currentNum.Value);
 
-            // With numbers
+            // With numbers:
             var newTreeItem = currentNum == 1 ? new TermLine() : new TermLine(new Number(currentNum.Value));
 
             for (int i = 0; i < line.Terms.Count; i++)

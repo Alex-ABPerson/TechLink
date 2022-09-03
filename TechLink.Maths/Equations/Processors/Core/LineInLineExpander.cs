@@ -12,6 +12,7 @@ namespace TechLink.Maths.Equations.Processors.Core
     public class LineInLineExpander : Processor
     {
         public override bool Required => true;
+        public override string Title => "Tree Op (Line-in-Line)";
         public override TreeItem Perform(TreeItem itm)
         {
             return itm switch

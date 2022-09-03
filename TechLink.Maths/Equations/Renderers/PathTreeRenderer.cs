@@ -47,6 +47,11 @@ namespace TechLink.Maths.Equations.Renderers
                 if (IndentationLevel != 0) Interface.Write("-> ", InterfaceColor.Unimportant);
                 ExpressionTextRenderer.Render(item.Item);
 
+                if (item.Processor != null)
+                {
+                    Interface.Write(" ");
+                    Interface.Write(item.Processor.Title, InterfaceColor.Unimportant);
+                }
                 Interface.WriteLine();
             }
 

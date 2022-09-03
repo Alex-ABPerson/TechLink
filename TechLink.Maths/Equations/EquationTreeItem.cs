@@ -235,4 +235,15 @@ namespace TechLink.Maths.Equations
 
         public override TreeItem Clone() => new Function(Type, Arguments[0], IsInverse);
     }
+
+    public sealed class MultiTreeItem : TreeItem
+    {
+        public List<TreeItem> SubItems;
+
+        public MultiTreeItem(List<TreeItem> subItems) => SubItems = subItems;
+
+        public override TreeItem Clone() => throw new Exception("MultiTreeItem only intended for use in processor without cloning.");
+
+        protected override bool Matches(TreeItem right) => throw new Exception("MultiTreeItem  only intended for use in processor without checking.");
+    }
 }

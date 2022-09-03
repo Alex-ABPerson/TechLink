@@ -148,6 +148,12 @@ namespace TechLink.Maths.Equations.Helpers
 
         public void CancelIteration() => _currentState.Clear();
 
+        public void Reset(TreeItem item)
+        {
+            _currentState.Clear();
+            PushState(new ItemState(item));
+        }
+
         void PushState(ItemState newState) => _currentState.Add(newState);
         ItemState PopState()
         {
