@@ -178,7 +178,10 @@ namespace TechLink.Maths.Equations.Processors.Core
             for (int i = 0; i < termLine.Terms.Count; i++)
                 for (int j = 0; j < sharedItms.Count; j++)
                     if (termLine.Terms[i].Equals(sharedItms[j].Item))
+                    {
                         sharedItms[j] = new SharedTreeItem(sharedItms[j], true);
+                        break;
+                    }
 
             // Remove the items that didn't get marked
             for (int i = 0; i < sharedItms.Count; i++)
