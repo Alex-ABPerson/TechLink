@@ -140,7 +140,7 @@ namespace TechLink.Maths.Equations.Processors.Core
                     break;
             }
 
-            gcdVal = currentGcd ?? 1;
+            gcdVal = currentGcd == null ? 1 : Math.Abs(currentGcd.Value);
             return false;
 
         ZeroExit:
@@ -205,6 +205,9 @@ namespace TechLink.Maths.Equations.Processors.Core
             }    
             else
             {
+                // The common GCD is now 1.
+                sharedNumGCD = 1;
+
                 // See if this item exists anywhere in the shared items, and if so, keep only that one.
                 for (int j = 0; j < sharedItms.Count; j++)
                     if (sharedItms[j].Item.Equals(item))
