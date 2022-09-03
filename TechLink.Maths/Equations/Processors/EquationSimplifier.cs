@@ -78,12 +78,15 @@ namespace TechLink.Maths.Equations.Processors
                     if (!AddToPathAndProcessParent(res, processor, out PathTreeItem? newPath))
                     {
                         ProcessPath(newPath.Item, newPath);
+                    }
 
-                        if (isRequired)
-                        {
-                            exp.CancelIteration();
-                            return true;
-                        }
+                    // Don't bother processing this further if this is was a required processor.
+                    // We're going to do this regardless of if it already existed and committed it to the tree, because if it does even the fact that the current item is
+                    // one single operation away from being the same as another place means we shouldn't bother processing further.
+                    if (isRequired)
+                    {
+                        exp.CancelIteration();
+                        return true;
                     }
 
                     return false;
