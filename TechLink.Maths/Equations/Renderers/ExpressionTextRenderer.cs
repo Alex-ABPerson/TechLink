@@ -108,13 +108,20 @@ namespace TechLink.Maths.Equations.Renderers
             // If there are no items, don't write anything.
             if (line.Terms.Count == 0) return;
 
-            // If the term line is literally just "-1 x abc", just write "-abc".
+            // If the term line is literally just "num x abc", just write "-abc".
             if (line.Terms.Count == 2)
             {
-                bool isNegOnLeft = line.Terms[0] is Number { Value: -1 };
-                if (isNegOnLeft || line.Terms[1] is Number { Value: -1 })
+                bool isNegOnLeft = line.Terms[0] is Number;
+                if (isNegOnLeft || line.Terms[1] is Number)
                 {
-                    Interface.Write("-");
+                    Number numVal = isNegOnLeft ? (Number)line.Terms[0] : (Number)line.Terms[1];
+
+                    // If it's -1, write "-" instead of "-1".
+                    if (numVal.Value == -1)
+                        Interface.Write("-");
+                    else
+                        RenderItem(numVal, false);
+
                     RenderItem(line.Terms[isNegOnLeft ? 1 : 0], true);
                     return;
                 }
@@ -125,11 +132,11 @@ namespace TechLink.Maths.Equations.Renderers
 
             for (int i = 1; i < line.Terms.Count; i++)
             {
-                // Put brackets when we have two numbers after each other
-                bool twoNumbers = line.Terms[i] is Number && line.Terms[i - 1] is Number;
-                if (twoNumbers) Interface.Write("(");
+                // Put brackets when we have two numbers after each other, or if we have a term line within the term line
+                bool specialBrackets = line.Terms[i] is Number && line.Terms[i - 1] is Number || line.Terms[i] is TermLine;
+                if (specialBrackets) Interface.Write("(");
                 RenderItem(line.Terms[i], true);
-                if (twoNumbers) Interface.Write(")");
+                if (specialBrackets) Interface.Write(")");
             }
         }
 
