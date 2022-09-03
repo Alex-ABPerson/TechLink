@@ -43,7 +43,8 @@ namespace TechLink.Maths.Equations.Processors.Core
 
             // If there weren't multiple numbers in there, don't make any changes.
             // This is mainly to save us from pointlessly doing "2x + 3" into "3 + 2x" which looks really silly.
-            if (!hadMultipleNumbers) return additive;
+            // However, DO continue if the total value of it was 0, because that needs a change.
+            if (!hadMultipleNumbers && currentNum != 0) return additive;
 
             if (currentNum != null)
             {

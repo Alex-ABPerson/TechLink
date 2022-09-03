@@ -28,7 +28,7 @@ namespace TechLink.Maths.Equations.Processors.Core
         {
             AdditiveLine line = (AdditiveLine)itm;
 
-            if (line.Items.Count == 1) return line.Items[0];
+            if (line.Items.Count is 0 or 1) return line;
 
             List<TreeItem> res = new();
 
