@@ -30,12 +30,13 @@ namespace TechLink.Maths.Equations.Processors.Core
             if (line.Items.Count == 1) return line.Items[0];
 
             // Go through each combination of start/end point.
-            List<TreeItem> res = new List<TreeItem>();
+            List<TreeItem> res = new();
             for (int start = 0; start < line.Items.Count - 1; start++)
                 for (int end = start + 1; end < line.Items.Count; end++)
                 {
                     TreeItem? fullFactor = PerformOnTerms(line, start, end);
-                    if (fullFactor != null) res.Add(fullFactor);
+                    if (fullFactor != null) 
+                        res.Add(fullFactor);
                 }
 
             return new MultiTreeItem(res);
@@ -43,8 +44,10 @@ namespace TechLink.Maths.Equations.Processors.Core
 
         public TreeItem? PerformOnTerms(AdditiveLine line, int start, int end)
         {
+            // Return null if there's any zeros in there
             // Process the first item
-            CreateInfoFromFirstItem(line, out long sharedNumGCD, out List<SharedTreeItem> sharedItms);
+            if (CreateInfoFromFirstItem(line, out long sharedNumGCD, out List<SharedTreeItem> sharedItms))
+                return null;
 
             // Filter down the info from there - stopping if we encounter any 0 items.
             for (int i = start + 1; i <= end; i++)
@@ -55,13 +58,13 @@ namespace TechLink.Maths.Equations.Processors.Core
             if (sharedItms.Count == 0 && sharedNumGCD == 1) return null;
 
             // Create the final result
-            return CreateResult(line, sharedNumGCD, sharedItms);
+            return CreateResult(line, start, end, sharedNumGCD, sharedItms);
         }
 
-        private static TreeItem CreateResult(AdditiveLine line, long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static TreeItem CreateResult(AdditiveLine line, int start, int end, long sharedNumGCD, List<SharedTreeItem> sharedItms)
         {
             // Create a new additive line to represent the terms divided.
-            AdditiveLine dividedLine = CreateDividedLine(line, sharedNumGCD, sharedItms);
+            AdditiveLine dividedLine = CreateDividedLine(line, start, end, sharedNumGCD, sharedItms);
             
             var res = new TermLine();
 
@@ -95,30 +98,42 @@ namespace TechLink.Maths.Equations.Processors.Core
             return false;
         }
 
-        private static void CreateInfoFromFirstItem(AdditiveLine line, out long gcdVal, out List<SharedTreeItem> itm)
+        private static bool CreateInfoFromFirstItem(AdditiveLine line, out long gcdVal, out List<SharedTreeItem> itm)
         {
             long? currentGcd = null;
 
-            var firstTerm = line.Items[0];
-            if (firstTerm is TermLine firstLine)
+            switch (line.Items[0])
             {
-                itm = new List<SharedTreeItem>(firstLine.Terms.Count);
+                case TermLine firstLine:
+                    itm = new List<SharedTreeItem>(firstLine.Terms.Count);
 
-                for (int i = 0; i < firstLine.Terms.Count; i++)
-                    if (firstLine.Terms[i] is Number number)
-                        currentGcd = SetOrMultiply(currentGcd, number); // NOTE: We don't have to worry about 0 values for the first item as they're passed as the first arg to "GCD" on the next item and immediately replaced by that.
-                    else
-                        itm.Add(new SharedTreeItem(firstLine.Terms[i]));
+                    for (int i = 0; i < firstLine.Terms.Count; i++)
+                        if (firstLine.Terms[i] is Number number)
+                        {
+                            if (number.Value == 0) goto ZeroExit;
+                            currentGcd = SetOrMultiply(currentGcd, number);
+                        }
+                        else
+                            itm.Add(new SharedTreeItem(firstLine.Terms[i]));
+
+                    break;
+                case Number num:
+                    itm = new List<SharedTreeItem>();
+
+                    if (num.Value == 0) goto ZeroExit;
+                    currentGcd = num.Value;
+                    break;
+                default:
+                    itm = new List<SharedTreeItem>() { new SharedTreeItem(line.Items[0]) };
+                    break;
             }
-            else if (firstTerm is Number num)
-            {
-                itm = new List<SharedTreeItem>();
-                currentGcd = num.Value;
-            }
-            else
-                itm = new List<SharedTreeItem>() { new SharedTreeItem(firstTerm) };
 
             gcdVal = currentGcd ?? 1;
+            return false;
+
+        ZeroExit:
+            gcdVal = 0;
+            return true;
         }
 
         // Returns: Whether the number found was 0.
@@ -192,11 +207,11 @@ namespace TechLink.Maths.Equations.Processors.Core
             return false;
         }
 
-        private static AdditiveLine CreateDividedLine(AdditiveLine line, long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static AdditiveLine CreateDividedLine(AdditiveLine line, int start, int end, long sharedNumGCD, List<SharedTreeItem> sharedItms)
         {
             AdditiveLine res = new();
 
-            for (int i = 0; i < line.Items.Count; i++)
+            for (int i = start; i < end; i++)
             {
                 switch (line.Items[i])
                 {
