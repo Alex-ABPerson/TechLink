@@ -30,51 +30,82 @@ namespace TechLink.Maths.Equations.Processors.Core
 
             if (line.Items.Count is 0 or 1) return line;
 
-            List<TreeItem> res = new();
-
-            var iter = new AdditiveCombinationIterator(line, 2);
-            while (iter.NextCombination())
+            // Test out every combination, starting from the widest to the narrowest, and as soon as we find the best one for a given combination size, apply it!
+            int currentMaxSharedCount = 0;
+            int currentMaxSharedIdx = 0;
+            var iter = new AdditiveCombinationIterator(line);
+            while (iter.NextCombinationSize())
             {
-                TreeItem? fullFactor = PerformOnTerms(line, ref iter);
-                if (fullFactor != null) 
-                    res.Add(fullFactor);
+                List<TestInfo> tests = new();
+
+                while (iter.NextCombination())
+                {
+                    // Populate the info
+                    var newInfo = new TestInfo();
+                    if (!TestTerms(line, ref iter, newInfo)) continue;
+                    newInfo.Combination = iter.GetCurrentCombination();
+
+                    // Update our max tracking
+                    int thisSharedCount = newInfo.Shared.Count + (newInfo.SharedNumGCD == 1 ? 0 : 1);
+                    if (thisSharedCount > currentMaxSharedCount)
+                    {
+                        currentMaxSharedCount = thisSharedCount;
+                        currentMaxSharedIdx = tests.Count;
+                    }
+                    
+                    tests.Add(newInfo);
+                }
+
+                // If we found something at this size, use that.
+                if (currentMaxSharedCount > 0)
+                {
+                    var info = tests[currentMaxSharedIdx];
+                    iter.ResetToNoCopy(info.Combination);
+                    return CreateResult(line, ref iter, info);
+                }
             }
 
-            return new MultiTreeItem(res);
+            // We found nothing at any size, stop here
+            return itm;
         }
 
-        // Returns null if there's any zeros present
-        public TreeItem? PerformOnTerms(AdditiveLine line, ref AdditiveCombinationIterator iter)
+        public class TestInfo
+        {
+            public AdditiveCombination Combination;
+            public long SharedNumGCD;
+            public List<SharedTreeItem> Shared = null!;
+
+            public TestInfo() { }
+            public TestInfo(AdditiveCombination comb, List<SharedTreeItem> shared) => (Combination, SharedNumGCD, Shared) = (comb, 1, shared);
+        }
+
+        public bool TestTerms(AdditiveLine line, ref AdditiveCombinationIterator iter, TestInfo info)
         {
             // Process the first item
-            if (CreateInfoFromFirstItem(ref iter, out long sharedNumGCD, out List<SharedTreeItem> sharedItms))
-                return null;
+            if (FillInfoFromFirstItem(ref iter, info))
+                return false;
 
             // Filter down the info from there - stopping if we encounter any 0 items.
             foreach (var itm in iter.EnumerateCurrent(true))
-                if (FilterInfo(itm, ref sharedNumGCD, sharedItms)) 
-                    return null;
+                if (FilterInfo(itm, info)) 
+                    return false;
 
-            // If there's nothing shared, stop here.
-            if (sharedItms.Count == 0 && sharedNumGCD == 1) return null;
-
-            // Create the final result
-            return CreateResult(line, ref iter, sharedNumGCD, sharedItms);
+            return true;
         }
 
-        private static TreeItem CreateResult(AdditiveLine line, ref AdditiveCombinationIterator iter, long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static TreeItem CreateResult(AdditiveLine line, ref AdditiveCombinationIterator iter, TestInfo info)
         {
             // Create a new additive line to represent the terms divided.
-            AdditiveLine dividedLine = CreateDividedLine(ref iter, sharedNumGCD, sharedItms);
+            AdditiveLine dividedLine = CreateDividedLine(ref iter, info.SharedNumGCD, info.Shared);
 
             var res = new TermLine();
 
             // Add the GCD
-            if (sharedNumGCD != 1) res.Terms.Add(new Number(sharedNumGCD));
+            if (info.SharedNumGCD != 1) res.Terms.Add(new Number(info.SharedNumGCD));
 
             // Add the shared items
-            for (int i = 0; i < sharedItms.Count; i++)
-                res.Terms.Add(sharedItms[i].Item);
+            for (int i = 0; i < info.Shared.Count; i++)
+                res.Terms.Add(info.Shared[i].Item);
 
             // Add the divided additive
             res.Terms.Add(dividedLine);
@@ -92,24 +123,24 @@ namespace TechLink.Maths.Equations.Processors.Core
             else return res;
         }
 
-        private static bool FilterInfo(TreeItem item, ref long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static bool FilterInfo(TreeItem item, TestInfo info)
         {
             if (item is TermLine termLine)
             {
                 // First, find the number in it and update the GCD as necessary.
-                if (UpdateGCDFromNum(ref sharedNumGCD, termLine)) return true;
+                if (UpdateGCDFromNum(ref info.SharedNumGCD, termLine)) return true;
 
                 // Then, update the shared items from there
-                UpdateSharedItms(sharedItms, termLine);
+                UpdateSharedItms(info.Shared, termLine);
             }
             else
-                if (UpdateForSingleItem(item, ref sharedNumGCD, sharedItms)) 
+                if (UpdateForSingleItem(item, ref info.SharedNumGCD, info.Shared)) 
                     return true;
 
             return false;
         }
 
-        private static bool CreateInfoFromFirstItem(ref AdditiveCombinationIterator iter, out long gcdVal, out List<SharedTreeItem> itm)
+        private static bool FillInfoFromFirstItem(ref AdditiveCombinationIterator iter, TestInfo info)
         {
             long? currentGcd = null;
 
@@ -117,7 +148,7 @@ namespace TechLink.Maths.Equations.Processors.Core
             switch (first)
             {
                 case TermLine firstLine:
-                    itm = new List<SharedTreeItem>(firstLine.Terms.Count);
+                    info.Shared = new List<SharedTreeItem>(firstLine.Terms.Count);
 
                     for (int i = 0; i < firstLine.Terms.Count; i++)
                         if (firstLine.Terms[i] is Number number)
@@ -126,25 +157,25 @@ namespace TechLink.Maths.Equations.Processors.Core
                             currentGcd = SetOrMultiply(currentGcd, number);
                         }
                         else
-                            itm.Add(new SharedTreeItem(firstLine.Terms[i]));
+                            info.Shared.Add(new SharedTreeItem(firstLine.Terms[i]));
 
                     break;
                 case Number num:
-                    itm = new List<SharedTreeItem>();
+                    info.Shared = new List<SharedTreeItem>();
 
                     if (num.Value == 0) goto ZeroExit;
                     currentGcd = num.Value;
                     break;
                 default:
-                    itm = new List<SharedTreeItem>() { new SharedTreeItem(first) };
+                    info.Shared = new List<SharedTreeItem>() { new SharedTreeItem(first) };
                     break;
             }
 
-            gcdVal = currentGcd == null ? 1 : Math.Abs(currentGcd.Value);
+            info.SharedNumGCD = currentGcd == null ? 1 : Math.Abs(currentGcd.Value);
             return false;
 
         ZeroExit:
-            gcdVal = 0;
+            info.SharedNumGCD = 0;
             return true;
         }
 

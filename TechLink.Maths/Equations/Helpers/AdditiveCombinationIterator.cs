@@ -20,12 +20,23 @@ namespace TechLink.Maths.Equations.Helpers
         public int CurrentCombinationSize { get; set; }
         bool[] _currentCombination;
 
-        public AdditiveCombinationIterator(AdditiveLine line, int startCombinationSize)
+        public AdditiveCombinationIterator(AdditiveLine line)
         {
             _line = line;
             _currentCombination = new bool[line.Items.Count];
-            CurrentCombinationSize = startCombinationSize;
+            CurrentCombinationSize = _currentCombination.Length;
+            ResetDataForSize(_currentCombination.Length);
+        }
+
+        public bool NextCombinationSize()
+        {
+            if (!_started) return true;
+
+            CurrentCombinationSize--;
+            if (CurrentCombinationSize == 1) return false;
+
             ResetDataForSize(CurrentCombinationSize);
+            return true;
         }
 
         public bool NextCombination()
@@ -79,11 +90,8 @@ namespace TechLink.Maths.Equations.Helpers
                 }
             }
 
-            // If we got here, that means we couldn't move any of the current items and are done - move onto the next size.
-            CurrentCombinationSize++;
-            ResetDataForSize(CurrentCombinationSize);
-            return true;
-
+            // If we got here, that means we couldn't move any of the current items and are done with this size.
+            return false;
         }
 
         public TreeItem GetFirst()
@@ -93,10 +101,27 @@ namespace TechLink.Maths.Equations.Helpers
             return _line.Items[first];
         }
 
-        void ResetDataForSize(int size) => Array.Fill(_currentCombination, true, 0, size);
+        public void ResetToNoCopy(AdditiveCombination combination)
+        {
+            _currentCombination = combination.GetBoolArrayRepresentation();
+            _started = false;
+            CurrentCombinationSize = combination.CombinationSpread;
+        }
+
+        void ResetDataForSize(int size)
+        {
+            Array.Fill(_currentCombination, true, 0, size);
+            Array.Fill(_currentCombination, false, size, _currentCombination.Length - size);
+        }
 
         public CurrentCombinationEnumerable EnumerateCurrent(bool skipFirst) => new(ref this, true, skipFirst);
         public CurrentCombinationEnumerable EnumerateNonCurrent(bool skipFirst) => new(ref this, false, skipFirst);
+        public AdditiveCombination GetCurrentCombination()
+        {
+            bool[] newArr = new bool[_currentCombination.Length];
+            Array.Copy(_currentCombination, newArr, _currentCombination.Length);
+            return new AdditiveCombination(newArr, CurrentCombinationSize);
+        }
 
         public struct CurrentCombinationEnumerable : IEnumerable<TreeItem>, IEnumerator<TreeItem>
         {

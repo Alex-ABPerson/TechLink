@@ -84,31 +84,30 @@ namespace TechLink.Maths.Pages
                 return;
             }
 
-            Interface.WriteLineFormatted("$I{Enter the combination size} you want");
-            if (!int.TryParse(Interface.ReadLine(), out int combSize))
+            var iter = new AdditiveCombinationIterator(line);
+            while (iter.NextCombinationSize())
             {
-                Interface.WriteLineFormatted("$E{Not an integer}");
-                Interface.ReadLine();
-                return;
+                Interface.WriteLine("New Size");
+
+                while (iter.NextCombination())
+                {
+                    Interface.WriteFormatted("$S{First}: ");
+                    ExpressionTextRenderer.Render(iter.GetFirst());
+                    
+                    Interface.WriteLine();
+                    Interface.WriteFormatted("$S{With first}: ");
+                    foreach (var iterVal in iter.EnumerateCurrent(false))
+                        ExpressionTextRenderer.Render(iterVal);
+
+                    Interface.WriteLine();
+                    Interface.WriteFormatted("$S{Without first}: ");
+                    foreach (var iterVal in iter.EnumerateCurrent(true))
+                        ExpressionTextRenderer.Render(iterVal);
+
+                    Interface.WriteLine();
+                }
             }
-
-            var iter = new AdditiveCombinationIterator(line, combSize);
-            while (iter.NextCombination())
-            {
-                Interface.WriteFormatted("$S{First}: ");
-                ExpressionTextRenderer.Render(iter.GetFirst());
-
-                Interface.WriteFormatted("$S{With first}: ");
-                foreach (var iterVal in iter.EnumerateCurrent(false))
-                    ExpressionTextRenderer.Render(iterVal);
-
-                Interface.WriteLine();
-                Interface.WriteFormatted("$S{Without first}: ");
-                foreach (var iterVal in iter.EnumerateCurrent(true))
-                    ExpressionTextRenderer.Render(iterVal);
-
-                Interface.WriteLine();
-            }
+                
 
             Interface.ReadLine();
         }
