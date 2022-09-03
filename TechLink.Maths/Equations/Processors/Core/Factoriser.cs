@@ -89,7 +89,8 @@ namespace TechLink.Maths.Equations.Processors.Core
                 UpdateSharedItms(sharedItms, termLine);
             }
             else
-                UpdateForSingleItem(item, ref sharedNumGCD, sharedItms);
+                if (UpdateForSingleItem(item, ref sharedNumGCD, sharedItms)) 
+                    return true;
 
             return false;
         }
@@ -160,16 +161,17 @@ namespace TechLink.Maths.Equations.Processors.Core
                     sharedItms.RemoveAt(i--);
         }
 
-        private static void UpdateForSingleItem(TreeItem item, ref long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static bool UpdateForSingleItem(TreeItem item, ref long sharedNumGCD, List<SharedTreeItem> sharedItms)
         {
             if (item is Number num)
             {
-                // Ingore zeros
-                if (num.Value == 0) return;
-                sharedNumGCD = GCD(sharedNumGCD, num.Value);
-
                 // Clearly nothing is shared if this is all there was here
                 sharedItms.Clear();
+
+                // Ignore zeros
+                if (num.Value == 0) return true;
+
+                sharedNumGCD = GCD(sharedNumGCD, num.Value);
             }    
             else
             {
@@ -180,12 +182,14 @@ namespace TechLink.Maths.Equations.Processors.Core
                         var keep = sharedItms[j];
                         sharedItms.Clear();
                         sharedItms.Add(keep);
-                        return;
+                        return false;
                     }
 
                 // If none of them matched, then there are no shared items!
                 sharedItms.Clear();
             }
+
+            return false;
         }
 
         private static AdditiveLine CreateDividedLine(AdditiveLine line, long sharedNumGCD, List<SharedTreeItem> sharedItms)
