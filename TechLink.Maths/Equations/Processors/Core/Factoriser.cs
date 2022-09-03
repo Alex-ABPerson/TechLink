@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TechLink.Maths.Equations.Helpers;
 
 namespace TechLink.Maths.Equations.Processors.Core
 {
@@ -29,43 +30,43 @@ namespace TechLink.Maths.Equations.Processors.Core
 
             if (line.Items.Count == 1) return line.Items[0];
 
-            // Go through each combination of start/end point.
             List<TreeItem> res = new();
-            for (int start = 0; start < line.Items.Count - 1; start++)
-                for (int end = start + 1; end < line.Items.Count; end++)
-                {
-                    TreeItem? fullFactor = PerformOnTerms(line, start, end);
-                    if (fullFactor != null) 
-                        res.Add(fullFactor);
-                }
+
+            var iter = new AdditiveCombinationIterator(line, 2);
+            while (iter.NextCombination())
+            {
+                TreeItem? fullFactor = PerformOnTerms(line, ref iter);
+                if (fullFactor != null) 
+                    res.Add(fullFactor);
+            }
 
             return new MultiTreeItem(res);
         }
 
-        public TreeItem? PerformOnTerms(AdditiveLine line, int start, int end)
+        // Returns null if there's any zeros present
+        public TreeItem? PerformOnTerms(AdditiveLine line, ref AdditiveCombinationIterator iter)
         {
-            // Return null if there's any zeros in there
             // Process the first item
-            if (CreateInfoFromFirstItem(line, out long sharedNumGCD, out List<SharedTreeItem> sharedItms))
+            if (CreateInfoFromFirstItem(ref iter, out long sharedNumGCD, out List<SharedTreeItem> sharedItms))
                 return null;
 
             // Filter down the info from there - stopping if we encounter any 0 items.
-            for (int i = start + 1; i <= end; i++)
-                if (FilterInfo(line.Items[i], ref sharedNumGCD, sharedItms)) 
+            foreach (var itm in iter.EnumerateCurrent(true))
+                if (FilterInfo(itm, ref sharedNumGCD, sharedItms)) 
                     return null;
 
             // If there's nothing shared, stop here.
             if (sharedItms.Count == 0 && sharedNumGCD == 1) return null;
 
             // Create the final result
-            return CreateResult(line, start, end, sharedNumGCD, sharedItms);
+            return CreateResult(line, ref iter, sharedNumGCD, sharedItms);
         }
 
-        private static TreeItem CreateResult(AdditiveLine line, int start, int end, long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static TreeItem CreateResult(AdditiveLine line, ref AdditiveCombinationIterator iter, long sharedNumGCD, List<SharedTreeItem> sharedItms)
         {
             // Create a new additive line to represent the terms divided.
-            AdditiveLine dividedLine = CreateDividedLine(line, start, end, sharedNumGCD, sharedItms);
-            
+            AdditiveLine dividedLine = CreateDividedLine(ref iter, sharedNumGCD, sharedItms);
+
             var res = new TermLine();
 
             // Add the GCD
@@ -78,7 +79,17 @@ namespace TechLink.Maths.Equations.Processors.Core
             // Add the divided additive
             res.Terms.Add(dividedLine);
 
-            return res;
+            // If there are any items that are not included in the current combination, wrap this in an additive line and add them to the end of it.
+            if (iter.CurrentCombinationSize != line.Items.Count)
+            {
+                var wrappedRes = new AdditiveLine(res);
+
+                foreach (var itm in iter.EnumerateNonCurrent(false))
+                    wrappedRes.Items.Add(itm);
+
+                return wrappedRes;
+            }
+            else return res;
         }
 
         private static bool FilterInfo(TreeItem item, ref long sharedNumGCD, List<SharedTreeItem> sharedItms)
@@ -98,11 +109,12 @@ namespace TechLink.Maths.Equations.Processors.Core
             return false;
         }
 
-        private static bool CreateInfoFromFirstItem(AdditiveLine line, out long gcdVal, out List<SharedTreeItem> itm)
+        private static bool CreateInfoFromFirstItem(ref AdditiveCombinationIterator iter, out long gcdVal, out List<SharedTreeItem> itm)
         {
             long? currentGcd = null;
 
-            switch (line.Items[0])
+            TreeItem first = iter.GetFirst();
+            switch (first)
             {
                 case TermLine firstLine:
                     itm = new List<SharedTreeItem>(firstLine.Terms.Count);
@@ -124,7 +136,7 @@ namespace TechLink.Maths.Equations.Processors.Core
                     currentGcd = num.Value;
                     break;
                 default:
-                    itm = new List<SharedTreeItem>() { new SharedTreeItem(line.Items[0]) };
+                    itm = new List<SharedTreeItem>() { new SharedTreeItem(first) };
                     break;
             }
 
@@ -207,13 +219,12 @@ namespace TechLink.Maths.Equations.Processors.Core
             return false;
         }
 
-        private static AdditiveLine CreateDividedLine(AdditiveLine line, int start, int end, long sharedNumGCD, List<SharedTreeItem> sharedItms)
+        private static AdditiveLine CreateDividedLine(ref AdditiveCombinationIterator iter, long sharedNumGCD, List<SharedTreeItem> sharedItms)
         {
             AdditiveLine res = new();
 
-            for (int i = start; i < end; i++)
-            {
-                switch (line.Items[i])
+            foreach (var itm in iter.EnumerateCurrent(false))
+                switch (itm)
                 {
                     // For TermLines
                     case TermLine termLine:
@@ -233,14 +244,13 @@ namespace TechLink.Maths.Equations.Processors.Core
 
                     // For our end result
                     default:
-                        if (DividesBy(line.Items[i], sharedItms))
+                        if (DividesBy(itm, sharedItms))
                             res.Items.Add(new Number(1));
                         else
-                            res.Items.Add(line.Items[i]);
+                            res.Items.Add(itm);
 
                         break;
                 }
-            }
 
             return res;
         }
