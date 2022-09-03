@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TechLink.Maths.Equations.Helpers;
 using TechLink.Maths.Equations.Processors.Core;
+using TechLink.Maths.Equations.Renderers;
 
 namespace TechLink.Maths.Equations.Processors
 {
@@ -66,6 +67,7 @@ namespace TechLink.Maths.Equations.Processors
                     }
                 }
 
+                //PathTreeRenderer.Render(_rootPath);
                 return false;
 
                 bool HandleProcessorResult(TreeItem res, Processor processor)

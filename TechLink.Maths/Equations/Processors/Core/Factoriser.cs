@@ -204,7 +204,7 @@ namespace TechLink.Maths.Equations.Processors.Core
             {
                 // See if this item exists anywhere in the shared items, and if so, keep only that one.
                 for (int j = 0; j < sharedItms.Count; j++)
-                    if (sharedItms[j].Equals(item))
+                    if (sharedItms[j].Item.Equals(item))
                     {
                         var keep = sharedItms[j];
                         sharedItms.Clear();
@@ -260,6 +260,10 @@ namespace TechLink.Maths.Equations.Processors.Core
             long numComp = 1;
             List<TreeItem> items = new();
 
+            // Unmark all of the items
+            for (int i = 0; i < otherDiv.Count; i++)
+                otherDiv[i] = new SharedTreeItem(otherDiv[i], false);
+
             // Add all terms that aren't shared + Find coefficient
             for (int i = 0; i < termLine.Terms.Count; i++)
             {
@@ -274,8 +278,11 @@ namespace TechLink.Maths.Equations.Processors.Core
                 bool isShared = false;
                 for (int j = 0; j < otherDiv.Count; j++)
                 {
-                    if (termLine.Terms[i].Equals(otherDiv[j].Item))
+                    if (!otherDiv[j].Mark && termLine.Terms[i].Equals(otherDiv[j].Item))
                     {
+                        // Mark this item so we don't try this one again
+                        otherDiv[j] = new SharedTreeItem(otherDiv[j], true);
+
                         isShared = true;
                         break;
                     }
