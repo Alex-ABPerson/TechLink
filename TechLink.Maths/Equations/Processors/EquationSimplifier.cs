@@ -132,7 +132,6 @@ namespace TechLink.Maths.Equations.Processors
         static readonly Processor[] _additiveProcessors = new Processor[] { new Factoriser() };
         static readonly Processor[] _termLineProcessors = new Processor[] { new Expander() };
 
-
         public IList<Processor> GetProcessors(TreeItem itm) => itm switch
         {
             AdditiveLine => _additiveProcessors,

@@ -167,6 +167,9 @@ namespace TechLink.Maths.Equations.Processors.Core
                 // Ingore zeros
                 if (num.Value == 0) return;
                 sharedNumGCD = GCD(sharedNumGCD, num.Value);
+
+                // Clearly nothing is shared if this is all there was here
+                sharedItms.Clear();
             }    
             else
             {
