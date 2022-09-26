@@ -75,25 +75,23 @@ namespace TechLink.Maths.Equations.Processors
                     if (res.Equals(itm)) return false;
 
                     // If the path doesn't already exist, process it!
-                    if (!AddToPathAndProcessParent(res, processor, out PathTreeItem? newPath))
+                    if (AddToPathAndProcessParent(res, processor, out PathTreeItem? newPath))
                     {
-                        ProcessPath(newPath.Item, newPath);
-                    }
+                        ProcessPath(newPath!.Item, newPath);
 
-                    // Don't bother processing this further if this is was a required processor.
-                    // We're going to do this regardless of if it already existed and committed it to the tree, because if it does even the fact that the current item is
-                    // one single operation away from being the same as another place means we shouldn't bother processing further.
-                    if (isRequired)
-                    {
-                        exp.CancelIteration();
-                        return true;
+                        // Don't bother processing this further if this is was a required processor.
+                        if (isRequired)
+                        {
+                            exp.CancelIteration();
+                            return true;
+                        }
                     }
 
                     return false;
                 }
 
-                // Returns: Already exists in path
-                bool AddToPathAndProcessParent(TreeItem newItm, Processor proc, [NotNullWhen(false)] out PathTreeItem? newPath)
+                // Returns: Added to path
+                bool AddToPathAndProcessParent(TreeItem newItm, Processor proc, [NotNullWhen(true)] out PathTreeItem? newPath)
                 {
                     newPath = null;
 
@@ -102,12 +100,12 @@ namespace TechLink.Maths.Equations.Processors
                     if (!isRoot) exp.SetCurrentItemInTree(newTree, newItm);
 
                     // If it's in the tree, don't process further
-                    if (CheckIsInPathTree(newTree)) return true;
+                    if (CheckIsInPathTree(newTree)) return false;
 
                     newPath = new PathTreeItem(newTree, proc);
                     path.Children.Add(newPath);
 
-                    return false;
+                    return true;
                 }
             }
         }

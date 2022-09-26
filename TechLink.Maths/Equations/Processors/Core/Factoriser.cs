@@ -193,7 +193,7 @@ namespace TechLink.Maths.Equations.Processors.Core
 
             if (num == null) num = 1;
 
-            sharedNumGCD = GCD(sharedNumGCD, num.Value);
+            sharedNumGCD = GCD(sharedNumGCD, Math.Abs(num.Value));
             return false;
         }
 
@@ -232,7 +232,7 @@ namespace TechLink.Maths.Equations.Processors.Core
                 // Ignore zeros
                 if (num.Value == 0) return true;
 
-                sharedNumGCD = GCD(sharedNumGCD, num.Value);
+                sharedNumGCD = GCD(sharedNumGCD, Math.Abs(num.Value));
             }    
             else
             {

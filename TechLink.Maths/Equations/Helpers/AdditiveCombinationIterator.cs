@@ -16,7 +16,7 @@ namespace TechLink.Maths.Equations.Helpers
     {
         // TODO: Cache start position?
         AdditiveLine _line;
-        bool _started = false;
+        bool _startedCurrSize = false;
         public int CurrentCombinationSize { get; set; }
         bool[] _currentCombination;
 
@@ -30,7 +30,7 @@ namespace TechLink.Maths.Equations.Helpers
 
         public bool NextCombinationSize()
         {
-            if (!_started) return true;
+            if (!_startedCurrSize) return true;
 
             CurrentCombinationSize--;
             if (CurrentCombinationSize == 1) return false;
@@ -41,9 +41,9 @@ namespace TechLink.Maths.Equations.Helpers
 
         public bool NextCombination()
         {
-            if (!_started)
+            if (!_startedCurrSize)
             {
-                _started = true;
+                _startedCurrSize = true;
                 return true;
             }
 
@@ -104,7 +104,7 @@ namespace TechLink.Maths.Equations.Helpers
         public void ResetToNoCopy(AdditiveCombination combination)
         {
             _currentCombination = combination.GetBoolArrayRepresentation();
-            _started = false;
+            _startedCurrSize = false;
             CurrentCombinationSize = combination.CombinationSpread;
         }
 
@@ -112,6 +112,7 @@ namespace TechLink.Maths.Equations.Helpers
         {
             Array.Fill(_currentCombination, true, 0, size);
             Array.Fill(_currentCombination, false, size, _currentCombination.Length - size);
+            _startedCurrSize = false;
         }
 
         public CurrentCombinationEnumerable EnumerateCurrent(bool skipFirst) => new(ref this, true, skipFirst);
