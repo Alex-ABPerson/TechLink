@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define FEATURE_WAIT_FOR_FULL_EXPANSION
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,12 +25,26 @@ namespace TechLink.Maths.Equations.Processors.Core
         // However, there IS a benefit to factorising "-1" so we always do that. Because -1 is a kind of "in-between" state between full factorisation and not, it logically makes sense that this happened.
         // However, there is 100% no doubt benefit to factorising different groups of items, so we do that.
         //
+        // WAIT FOR FULL EXPANSION:
+        //
+        // Factorising can introduce THOUSANDS of unnecessary paths and there has to be some smart way of reducing them. One such method I'm trialling here is to refuse to factorise terms like:
+        // xx(x+1) + x
+        // It could turn this into "x(x(x+1) + 1)", but we're going to introduce a new rule that forces it to wait until the "xx(x+1)" is expanded before anything happens:
+        // It rejects things with additive lines embedded. This should hopefully help us stop being as silly as we are in so many places.
+        // If factorisation isn't working properly, here's what to remove, it's added at the top.
+        // Note that this rule DOES NOT wait for full expansion in situation like "2(x+1) + x(x+1)" for obvious reasons.
+        //
         // TODO: Investigate fractional divisions.
         public override TreeItem Perform(TreeItem itm)
         {
             AdditiveLine line = (AdditiveLine)itm;
 
             if (line.Items.Count is 0 or 1) return line;
+
+#if FEATURE_WAIT_FOR_FULL_EXPANSION
+            // If we have any additive lines embedded directly in there, like "xx(x+1) + x", flag them up in this list, and we'll reject anything that's not using it as a shared term.
+            var expandableTerms = GetWFFERequirementTerms(line);
+#endif
 
             // Test out every combination, starting from the widest to the narrowest, and as soon as we find the best one for a given combination size, apply it!
             int currentMaxSharedCount = 0;
@@ -44,6 +60,10 @@ namespace TechLink.Maths.Equations.Processors.Core
                     var newInfo = new TestInfo();
                     if (!TestTerms(line, ref iter, newInfo)) continue;
                     newInfo.Combination = iter.GetCurrentCombination();
+
+#if FEATURE_WAIT_FOR_FULL_EXPANSION
+                    if (ContainsNonSharedExpandableItems(newInfo)) continue;
+#endif
 
                     // Update our max tracking
                     int thisSharedCount = newInfo.Shared.Count + (newInfo.SharedNumGCD == 1 ? 0 : 1);
@@ -65,8 +85,47 @@ namespace TechLink.Maths.Equations.Processors.Core
                 }
             }
 
+#if FEATURE_WAIT_FOR_FULL_EXPANSION
+            bool ContainsNonSharedExpandableItems(TestInfo info)
+            {
+                if (expandableTerms == null) return false;
+
+                for (int i = 0; i < expandableTerms.Count; i++)
+                {
+                    // If it's in one of the shared, it's fine, otherwise, stop here.
+                    for (int j = 0; j < info.Shared.Count; j++)
+                        if (info.Shared[j].Item.Equals(expandableTerms[i]))
+                            goto Fine;
+
+                    return true;
+
+                Fine:
+                    continue;
+                }
+                    
+
+                return false;
+            }
+#endif
+
             // We found nothing at any size, stop here
             return itm;
+        }
+
+        static List<TreeItem>? GetWFFERequirementTerms(AdditiveLine line)
+        {
+            List<TreeItem>? res = null;
+
+            foreach (var itm in line.Items)
+                if (itm is TermLine innerLine)
+                    for (int i = 0; i < innerLine.Terms.Count; i++)
+                        if (innerLine.Terms[i] is AdditiveLine addLine)
+                        {
+                            res ??= new List<TreeItem>();
+                            res.Add(addLine);
+                        }
+
+            return res;
         }
 
         public class TestInfo
