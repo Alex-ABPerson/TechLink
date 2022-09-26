@@ -267,7 +267,7 @@ namespace TechLink.Maths.Equations.Processors.Core
             // Go through the items and "mark" anything that's in the shared list.
             for (int i = 0; i < termLine.Terms.Count; i++)
                 for (int j = 0; j < sharedItms.Count; j++)
-                    if (termLine.Terms[i].Equals(sharedItms[j].Item))
+                    if (!sharedItms[j].Mark && termLine.Terms[i].Equals(sharedItms[j].Item))
                     {
                         sharedItms[j] = new SharedTreeItem(sharedItms[j], true);
                         break;
