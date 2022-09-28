@@ -43,7 +43,20 @@ namespace TechLink.Maths.Pages
 
             PathTreeRenderer.Render(path);
 
+            // Write out the number of path items, development feature
+            int count = 1 + CountChildren(path);
+            Interface.WriteFormatted("$S{Number of path items: }");
+            Interface.WriteLine(count.ToString());
+
             Interface.ReadLine();
+
+            static int CountChildren(PathTreeItem itm)
+            {
+                int res = itm.Children.Count;
+                foreach (var child in itm.Children)
+                    res += CountChildren(child);
+                return res;
+            }
         }
 
         public override string Title => "Expression";

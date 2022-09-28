@@ -112,7 +112,7 @@ namespace TechLink.Maths.Equations.Renderers
             if (line.Terms.Count == 2)
             {
                 bool isNegOnLeft = line.Terms[0] is Number;
-                if (isNegOnLeft || line.Terms[1] is Number)
+                if (isNegOnLeft ^ line.Terms[1] is Number)
                 {
                     Number numVal = isNegOnLeft ? (Number)line.Terms[0] : (Number)line.Terms[1];
 
