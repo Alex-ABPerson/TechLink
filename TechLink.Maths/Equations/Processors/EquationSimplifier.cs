@@ -70,28 +70,31 @@ namespace TechLink.Maths.Equations.Processors
                 //PathTreeRenderer.Render(_rootPath);
                 return false;
 
+                // Returns: Should stop
                 bool HandleProcessorResult(TreeItem res, Processor processor)
                 {
                     if (res.Equals(itm)) return false;
 
                     // If the path doesn't already exist, process it!
-                    if (AddToPathAndProcessParent(res, processor, out PathTreeItem? newPath))
-                    {
+                    // TODO: For xx(x + 6) + (6x + 6(6)) + x3x + 18x + xx2 + 12x, we're skipping a required processor because of
+                    // its path already existing
+                    var status = TryAddToPath(res, processor, out PathTreeItem? newPath);
+                    if (status == ExistingTreeStatus.NewTree)
                         ProcessPath(newPath!.Item, newPath);
 
-                        // Don't bother processing this further if this is was a required processor.
-                        if (isRequired)
-                        {
-                            exp.CancelIteration();
-                            return true;
-                        }
+                    // Don't bother processing this tree any further if this was a required processor we just applied.
+                    // The only time we *don't* cancel after a required processor is if the required processor happened to give back the exact same thing as our current path item right now, which *can* happen
+                    // due to "Equals"'s behaviour with ignoring order and such. In those circumstances, stopping could result in us never going anywhere, so we let only that slide.
+                    if (isRequired && status != ExistingTreeStatus.IsCurrentTree)
+                    {
+                        exp.CancelIteration();
+                        return true;
                     }
 
                     return false;
                 }
 
-                // Returns: Added to path
-                bool AddToPathAndProcessParent(TreeItem newItm, Processor proc, [NotNullWhen(true)] out PathTreeItem? newPath)
+                ExistingTreeStatus TryAddToPath(TreeItem newItm, Processor proc, [NotNullWhen(true)] out PathTreeItem? newPath)
                 {
                     newPath = null;
 
@@ -99,30 +102,34 @@ namespace TechLink.Maths.Equations.Processors
                     TreeItem newTree = isRoot ? newItm : currentTree.Clone();
                     if (!isRoot) exp.SetCurrentItemInTree(newTree, newItm);
 
-                    // If it's in the tree, don't process further
-                    if (CheckIsInPathTree(newTree)) return false;
+                    // If it's already in the tree, return back and don't make a new tree
+                    PathTreeItem? existingPathItm = FindInPathTree(newTree);
+                    if (existingPathItm != null) return existingPathItm == path ? ExistingTreeStatus.IsCurrentTree : ExistingTreeStatus.AlreadyExists;
 
                     newPath = new PathTreeItem(newTree, proc);
                     path.Children.Add(newPath);
 
-                    return true;
+                    return ExistingTreeStatus.NewTree;
                 }
             }
         }
-        public bool CheckIsInPathTree(TreeItem itm)
-        {
-            return IsInAt(itm, _rootPath);
 
-            static bool IsInAt(TreeItem itm, PathTreeItem path)
+        public PathTreeItem? FindInPathTree(TreeItem itm)
+        {
+            return FindIn(_rootPath);
+
+            PathTreeItem? FindIn(PathTreeItem path)
             {
                 if (path.Item.Equals(itm))
-                    return true;
+                    return path;
 
                 foreach (var child in path.Children)
-                    if (IsInAt(itm, child))
-                        return true;
+                {
+                    PathTreeItem? childTree = FindIn(child);
+                    if (childTree != null) return childTree;
+                }
 
-                return false;
+                return null;
             }
         }
 
@@ -149,6 +156,13 @@ namespace TechLink.Maths.Equations.Processors
             Division => _divisionReqProcessors,
             _ => Array.Empty<Processor>()
         };
+
+        enum ExistingTreeStatus
+        {
+            AlreadyExists,
+            IsCurrentTree,
+            NewTree
+        }
     }
 
     public class PathTreeItem

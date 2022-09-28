@@ -11,8 +11,8 @@ namespace TechLink.Maths.Equations
 {
     public abstract class TreeItem
     {
-        bool _hasHashCache = false;
-        int _hashCache;
+        //bool _hasHashCache = false;
+        //int _hashCache;
 
         public override bool Equals(object? obj)
         {
@@ -28,14 +28,7 @@ namespace TechLink.Maths.Equations
             return Matches(asTreeItem);
         }
 
-        public override int GetHashCode()
-        {
-            if (_hasHashCache)
-                return _hashCache;
-
-            _hashCache = ComputeHash();
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
 
         protected abstract bool Matches(TreeItem right);
 
@@ -50,8 +43,6 @@ namespace TechLink.Maths.Equations
             return Unsafe.As<T>(obj);
 #endif
         }
-
-        protected void InvalidateHashCode() => _hasHashCache = false;
 
         public abstract TreeItem Clone();
     }
