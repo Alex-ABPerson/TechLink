@@ -31,7 +31,7 @@ namespace TechLink.Maths.Equations.Renderers
                     break;
                 case Power power:
                     RenderItem(power.Base, true);
-                    Interface.Write(" ^ ");
+                    Interface.Write("^");
                     RenderItem(power.Exponent, true);
                     break;
                 case TermLine term:

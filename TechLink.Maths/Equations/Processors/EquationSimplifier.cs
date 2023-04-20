@@ -134,8 +134,8 @@ namespace TechLink.Maths.Equations.Processors
         }
 
         // "Required" processors
-        static readonly Processor[] _additiveReqProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
-        static readonly Processor[] _termLineReqProcessors = new Processor[] { new NumberFold(), new SingleItemLineExpander(), new LineInLineExpander() };
+        static readonly Processor[] _additiveReqProcessors = new Processor[] { new SingleItemLineExpander(), new LineInLineExpander(), new NumberFold() }; // Putting NumberFold last on these is more efficient
+        static readonly Processor[] _termLineReqProcessors = new Processor[] { new SingleItemLineExpander(), new LineInLineExpander(), new NumberFold() }; // as there's scenarios it might try to number fold
         static readonly Processor[] _divisionReqProcessors = new Processor[] { new NumberFold() };
 
         // Normal processors

@@ -57,6 +57,7 @@ namespace TechLink.Maths.Equations.Processors.Core
                 while (iter.NextCombination())
                 {
                     // Populate the info
+                    // TODO: This is broken, (x + 1)(x + 3) / (x + 2)(x + -1(3)) - actually, is it?
                     var newInfo = new TestInfo();
                     if (!TestTerms(line, ref iter, newInfo)) continue;
                     newInfo.Combination = iter.GetCurrentCombination();
